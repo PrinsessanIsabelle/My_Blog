@@ -1,20 +1,36 @@
 const router = require('express').Router();
-const db = require('../models/');
+const db = require('../models');
 const validate = require('validate.js');
 
 const constraints = { 
-title: {
+email: {
     length: {
-        minimum: 2,
-        maximum: 100,
-        tooShort: "^Titeln måste vara minst %{count} tecken lång",
-        tooLong: "^Titeln får inte vara längre än %{count} tecken"
+        minimum: 4,
+        maximum: 200,
+        tooShort: "^Adressen måste vara minst %{count} tecken lång",
+        tooLong: "^Adressen får inte vara längre än %{count} tecken"
+    },
+    email: {
+        message: "^Adressen måste vara en giltig e-postadress."
     }
+},
+username: {
+    length: {
+        minimum: 4,
+        maximum: 50,
+        tooShort: "^Användarnamnet måste vara minst %{count} tecken lång",
+        tooLong: "^Användarnamnet får inte vara längre än %{count} tecken"
+}
+},
+imageUrl: {
+    url: {
+      message: "^Bild-URL måste vara en giltig URL."  
     }
 }
+};
 
 router.get('/', (req, res) => {
-  db.post.findAll().then((result) => {
+  db.user.findAll().then((result) => {
     res.send(result);
   })
     // res.send('Get posts');
@@ -26,7 +42,7 @@ router.post ('/', (req, res) => {
    if(invalidData) {
     res.status(400).json(invalidData);
    } else {
-    db.post.create(post).then((result) => {
+    db.user.create(post).then((result) => {
    res.send(result);
    });
     }
@@ -39,7 +55,7 @@ router.put('/', (req, res) => {
     if(invalidData || !id) {
         res.status(400).json(invalidData || {id: "Id krävs."});
     } else {
-  db.post.update(post, {
+  db.user.update(post, {
     where: {
       id: post.id
     }
@@ -51,7 +67,7 @@ router.put('/', (req, res) => {
 });
 
 router.delete('/', (req, res) => {
- db.post.destroy({ where: {
+ db.user.destroy({ where: {
     id: req.body.id
   }}).then(() => {
     res.json('Inlägget raderades');

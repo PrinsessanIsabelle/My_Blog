@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const Sequelize = require("sequelize");
 const process = require("process");
+const { on } = require('events');
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || "development";
 const config = require(__dirname + "/../config/config.json")[env];
@@ -43,6 +44,30 @@ Object.keys(db).forEach((modelName) => {
     db[modelName].associate(db);
   }
 });
+
+db.post.belongsTo(db.user);
+db.user.hasMany(db.post, {
+  allowNull: false,
+  onDelete: "CASCADE",
+});
+
+db.comment.belongsTo(db.post);
+db.post.hasMany(db.comment, {
+  allowNull: false,
+  onDelete: "CASCADE"  
+});
+
+db.comment.belongsTo(db.user);
+db.user.hasMany(db.comment, {
+  allowNull: false,
+  onDelete: "CASCADE" 
+});
+
+
+db.post.belongsToMany(db.tag, {through: db.postTag});
+db.tag.belongsToMany(db.post, {through: db.postTag});
+
+
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
